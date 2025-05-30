@@ -23,6 +23,9 @@ public class MatchingController {
     @PostMapping("/create")
     public ResponseEntity<?> createMatch(@RequestBody MatchCreateRequest request) {
         String userId = SecurityUtil.getCurrentUserId();
+        System.out.println("매치 생성 요청 아이디 : " + userId);
+        System.out.println("matchDay raw: '" + request.getMatchDay() + "'");
+        System.out.println("matchTime raw: '" + request.getMatchTime() + "'");
         matchingService.createMatch(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body("매치 생성 완료");
     }

@@ -1,6 +1,7 @@
 package org.example.but_eo.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.but_eo.dto.*;
 import org.example.but_eo.entity.*;
 import org.example.but_eo.repository.*;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MatchingService {
 
@@ -30,6 +32,7 @@ public class MatchingService {
 
     @Transactional
     public void createMatch(MatchCreateRequest request, String userId) {
+        log.info("UserHashId : " + userId);
         TeamMember leader = teamMemberRepository.findByUser_UserHashIdAndType(userId, TeamMember.Type.LEADER)
                 .orElseThrow(() -> new RuntimeException("리더 팀이 없습니다."));
 
@@ -47,11 +50,16 @@ public class MatchingService {
         LocalTime time;
         LocalDateTime matchDate;
         try {
-            date = LocalDate.parse(request.getMatchDay());
-            time = LocalTime.parse(request.getMatchTime());
+            date = LocalDate.parse(request.getMatchDay().trim());
+            time = LocalTime.parse(request.getMatchTime().trim());
+            System.out.println("matchDay raw: '" + request.getMatchDay() + "'");
+            System.out.println("matchTime raw: '" + request.getMatchTime() + "'");
             matchDate = LocalDateTime.of(date, time);
             matching.setMatchDate(matchDate);
         } catch (Exception e) {
+            System.err.println("날짜 또는 시간 파싱 오류 발생!");
+            System.err.println("오류 메시지: " + e.getMessage()); // 이 부분이 핵심
+            e.printStackTrace(); // 스택 트레이스도 출력하여 원인 파악
             throw new RuntimeException("날짜 또는 시간 형식이 잘못되었습니다.");
         }
     
